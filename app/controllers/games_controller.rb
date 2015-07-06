@@ -18,7 +18,7 @@ class GamesController < ProtectedController
                user: current_user.id)
   end
 
-  def save(game, status=:success)
+  def save(game, status = :ok)
     if game.save
       render json: game, status: status
     else
