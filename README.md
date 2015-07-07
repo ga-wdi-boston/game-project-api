@@ -125,14 +125,14 @@ Games are associated with users, `player_x` and `player_o`.  Actions, other than
 </tr>
 <tr>
   <td colspan="3">
-  The optional `over` query parameter specifies whether to retrieve games that have been marked completed
+  The optional `over` query parameter restricts the response to games with a matching `over` property.
   </td>
   <td>200, OK</td>
   <td><em>empty games</em></td>
 </tr>
 <tr>
   <td colspan="3">
-  The default is to retrieve only those games that have `over` equal to false.
+  The default is to retrieve all games associated with the user..
   </td>
   <td>401, Unauthorized</td>
   <td><em>empty</em></td>
@@ -206,13 +206,13 @@ Games are associated with users, `player_x` and `player_o`.  Actions, other than
 </tr>
 <tr>
   <td colspan="3"></td>
-  <td>400, Bad Request</td>
+  <td>404, Not Found</td>
   <td><em>empty</em></td>
 </tr>
 </table>
 
 ### index
-
+The `index` action is a *GET* that retrieves all the games associated with a user.  The response body will contain JSON containing an array of games, e.g.:
 
 ```json
 {
@@ -246,8 +246,18 @@ Games are associated with users, `player_x` and `player_o`.  Actions, other than
   ]
 }
 ```
+If the `over` query parameter is specified the results will be restricted accordingly.
+
+If there are no games associated with the user, the response body will contain an empty games array, e.g.:
+```json
+{
+  "games": [
+  ]
+}
+```
 
 ### create
+The `create` action expects a *POST* with an empty request body.  If the request is successful, the response will have an HTTP Status of 201, Created, and the body will contain JSON of the created game with `player_x` set to the user calling `create`, e.g.:
 ```json
 {
   "game": {
@@ -262,13 +272,32 @@ Games are associated with users, `player_x` and `player_o`.  Actions, other than
   }
 }
 ```
+If the request is unsuccessful, the response will have an HTTP Status of 400, Bad Request, and the response body will be JSON describing the errors.
 
 ### show
+The `show` action is a *GET* specifing the `id` of the game to retrieve.  If the request is successful the status will be 200, OK, and the response body will contain JSON for the game requested, e.g.:
+```json
+{
+  "game": {
+    "id": 1,
+    "cells": ["o","x","o","x","o","x","o","x","o"],
+    "over": true,
+    "player_x": {
+      "id": 1,
+      "email": "and@and.com"
+    },
+    "player_o": {
+      "id": 3,
+      "email": "dna@dna.com"
+    }
+  }
+}
+```
 
 ### update
 
 #### join a game as player 'o'
-The `update` action expects an empty *PATCH*, to join an existing game
+This `update` action expects an empty *PATCH*, to join an existing game.
 
 If the request is successful, the response will have an HTTP Status of 200, OK, and the body will be JSON containing the game joined, e.g.:
 ```json
@@ -289,11 +318,10 @@ If the request is successful, the response will have an HTTP Status of 200, OK, 
   }
 }
 ```
-If the request is unsuccessful, the response will have an HTTP Status of 401, Unauthorized, and the response body will be empty.
+If the request is unsuccessful, the response will have an HTTP Status of 400, Bad Request, and the response body will be empty (game cannot be joined, player_o already set or user making request is player_x) or JSON describing the errors.
 
 #### update a game's states
-Or a *PATCH* with changes to to an existing game
-
+This `update` action expects a *PATCH* with changes to to an existing game, e.g.:
 ```json
 {
   "game": {
@@ -305,8 +333,7 @@ Or a *PATCH* with changes to to an existing game
   }
 }
 ```
-
-
+If the request is successful, the response will have an HTTP Status of 200, OK, and the body will be JSON containing the modified game, e.g.:
 ```json
 {
   "game": {
@@ -325,17 +352,39 @@ Or a *PATCH* with changes to to an existing game
   }
 }
 ```
+If the request is unsuccessful, the response will have an HTTP Status of 400, Bad Request, and the response body will be JSON describing the errors.
 
 ### watch
 
 The `watch` action is handled differently than all the others.  Because `watch` implements a streaming source of data, we'll use a wrapper around the html5 object EventSource.
 
-You can find this wrapper in `vendor/assets/scripts/resource-watcher-0.1.0.js`.
+You can find this wrapper in the https://github.com/ga-wdi-boston/jquery-ajax-post-patch-fe repository.
+
+You create a watcher object using the resourceWatcher function.  This function takes two parameters, the watch url and a configuration object which must contain the Authorization token, and may contain an optional timeout in seconds, e.g.:
 
 ```js
-var gameWatcher =
-  resourceWatcher('<server>/games/:id/watch', {
+var gameWatcher = resourceWatcher('<server>/games/:id/watch', {
       Authorization: 'Token token=<token>'[,
       timeout: <timeout>]
+});
+```
+The watched resource has a default timeout of 120 seconds.
+
+You should add a handler for `change` and `error` events.  The error events are not the most informative.  The change event may return a timeout.
+
+```js
+game.on('change', function(d){
+  var data = JSON.parse(d);
+  if (data.timeout) { //not an error
+    game.close();
+    return console.warn(data.timeout);
+  }
+  var gameData = data.game;
+  var cell = gameData.cell;
+  var index = cell.index
+  var value = cell.value;
+});
+game.on('error', function(e){
+  console.error(e);
 });
 ```
