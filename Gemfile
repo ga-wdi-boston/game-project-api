@@ -24,6 +24,10 @@ gem 'rack-cors', require: 'rack/cors'
 
 gem 'active_model_serializers'
 
+group :production do
+  gem 'rails_12factor'
+end
+
 group :development, :test do
   gem 'capistrano', '~> 3.1.0'
   gem 'capistrano-bundler', '~> 1.1.2'
