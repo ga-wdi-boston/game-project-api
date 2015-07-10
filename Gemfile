@@ -28,6 +28,7 @@ group :development, :test do
   gem 'capistrano', '~> 3.1.0'
   gem 'capistrano-bundler', '~> 1.1.2'
   gem 'capistrano-rails', '~> 1.1.1'
+  gem 'capistrano-chruby', '~> 0.1.2'
 
   # Call 'byebug' anywhere to stop execution and get a debugger console
   gem 'byebug'
