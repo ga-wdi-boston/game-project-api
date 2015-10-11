@@ -2,6 +2,10 @@
 
 # A Tic-tac-toe data store API
 
+An API to store tic-tac-toe game state and let two players compete across the internet.  It allows players to register as uses of the API and play against other registered users.
+
+The API does not currently validate game states.
+
 ## API end-points
 
 Verb  | URI Pattern        | Controller#Action
@@ -15,7 +19,7 @@ PATCH | `/games/:id`       | `games#update`
 GET   | `/games/:id/watch` | `games#watch`
 
 
-All API actions, except `watch`, expect data in the request body to be JSON,  `Content-Type:application/json; charset=utf-8`, and return data, if any, as JSON in the response body.
+All API actions that expect data in the request body require JSON,  `Content-Type:application/json; charset=utf-8`, and returned data in the response body, if any, will also be JSON.
 
 ---
 ## User actions
@@ -111,7 +115,7 @@ If the request is unsuccessful, the response will have an HTTP Status of 400, Ba
 ## Game actions
 All games action requests must include a valid HTTP header `Authorization: Token token=<token>` or they will be rejected with a status of 401, Unauthorized.
 
-Games are associated with users, `player_x` and `player_o`.  Actions, other than update, will only retrieve a game if the user associated with the `Authorization` header is one of those two users.  If this requirement is unmet, the response will be 404, Not Found, except for the index action which will return an empty games array.  
+Games are associated with users, `player_x` and `player_o`.  Actions, other than update, will only retrieve a game if the user associated with the `Authorization` header is one of those two users.  If this requirement is unmet, the response will be 404, Not Found, except for the index action which will return an empty games array.
 
 *Summary:*
 <table>
@@ -366,9 +370,11 @@ If the request is unsuccessful, the response will have an HTTP Status of 400, Ba
 
 ### watch
 
-The `watch` action is handled differently than all the others.  Because `watch` implements a streaming source of data, we'll use a wrapper around the html5 object EventSource.
+The `watch` action is handled differently than all the others.  Because `watch` implements a streaming source of data, we'll use a wrapper around the html5 object EventSource to handle the events sent.
 
-You can find this wrapper in the https://github.com/ga-wdi-boston/jquery-ajax-post-patch-fe repository.
+You can find the wrapper [here](public/js/resource-watcher-0.1.0.js).  The wraper is also available from the deployed app at the path `/js/resource-watcher-0.1.0.js`.
+
+The events that watch implements let you know when a game has been updated.  By using this interface you can write code that lets a player see another's move almost as it happens.  Updates to the game from one player's browser are sent to the other's browser.
 
 You create a watcher object using the resourceWatcher function.  This function takes two parameters, the watch url and a configuration object which must contain the Authorization token, and may contain an optional timeout in seconds, e.g.:
 
