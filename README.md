@@ -7,7 +7,7 @@
 Verb  | URI Pattern        | Controller#Action
 ----  | -----------        | -----------------
 POST  | `/login`           | `users#login`
-POST  | `/register`        | `users#create`
+POST  | `/users`           | `users#create`
 GET   | `/games`           | `games#index`
 POST  | `/games`           | `games#create`
 GET   | `/games/:id`       | `games#show`
@@ -46,7 +46,7 @@ All API actions, except `watch`, expect data in the request body to be JSON,  `C
 </tr>
 <tr>
 <td>POST</td>
-<td>`/register`</td>
+<td>`/users`</td>
 <td><strong>credentials</strong></td>
 <td>201, Created</td>
 <td><strong>user</strong></td>
@@ -61,6 +61,7 @@ All API actions, except `watch`, expect data in the request body to be JSON,  `C
 ### login
 
 The `login` action expects a *POST* with `credentials` identifying a previously registered user, e.g.:
+
 ```json
 {
   "credentials": {
@@ -69,12 +70,18 @@ The `login` action expects a *POST* with `credentials` identifying a previously 
   }
 }
 ```
-If the request is successful, the response will have an HTTP Status of 200, OK, and the body will be JSON containing a token used to authenticate other requests, e.g.:
+
+If the request is successful, the response will have an HTTP Status of 200, OK, and the body will be JSON containing the user's `id`, `email`, and the `token` used to authenticate other requests, e.g.:
 ```json
 {
-  "token": "an example authentication token"
+  "user": {
+    "id": 1,
+    "email": "an@example.email",
+    "token": "an example authentication token"
+  }
 }
 ```
+
 If the request is unsuccessful, the response will have an HTTP Status of 401, Unauthorized, and the response body will be empty.
 
 ### create
@@ -89,11 +96,14 @@ The `create` action expects a *POST* of `credentials` identifying a new user to 
   }
 }
 ```
+
 If the request is successful, the response will have an HTTP Status of 201, Created, and the body will be JSON containing the `id` and `email` of the new user, e.g.:
 ```json
 {
-  "id": 1,
-  "email": "an@example.email"
+  "user": {
+    "id": 1,
+    "email": "an@example.email"
+  }
 }
 ```
 If the request is unsuccessful, the response will have an HTTP Status of 400, Bad Request, and the response body will be empty.

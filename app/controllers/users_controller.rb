@@ -6,7 +6,7 @@ class UsersController < OpenReadController
     credentials = user_credentials
     if (user = User.authenticate credentials[:email],
                                  credentials[:password])
-      render json: { token: user.token }
+      render json: user, serializer: UserLoginSerializer, root: 'user'
     else
       head :unauthorized
     end

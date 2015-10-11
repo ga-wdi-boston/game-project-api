@@ -2,13 +2,11 @@ Rails.application.routes.draw do
   # root 'welcome#index'
 
   post '/login' => 'users#login'
-  post '/register' => 'users#create'
-  #resources :users, only: :create
+  resources :users, only: [:index, :show, :create]
 
   resources :games, except: [:new, :edit, :destroy]
+  # this is the streaming interface
   get '/games/:id/watch' => 'games#watch'
-
-  #resources :tic_tac_toe_games, path: '/tic-tac-toe-games'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
