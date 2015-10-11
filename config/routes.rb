@@ -1,14 +1,18 @@
 Rails.application.routes.draw do
   # root 'welcome#index'
 
-  post '/login' => 'users#login'
-  resources :users, only: [:index, :show, :create]
+  post '/sign-up' => 'users#create'
+  post '/sign-in' => 'users#login'
+  delete '/sign-out/:id' => 'users#logout'
+  patch '/change-password/:id' => 'users#changepw'
+  resources :users, only: [:index, :show]
 
   resources :games, except: [:new, :edit, :destroy]
   # this is the streaming interface
   get '/games/:id/watch' => 'games#watch'
 
-  # The priority is based upon order of creation: first created -> highest priority.
+  # The priority is based upon order of creation:
+  # first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
   # You can have the root of your site routed with "root"
@@ -20,7 +24,7 @@ Rails.application.routes.draw do
   # Example of named route that can be invoked with purchase_url(id: product.id)
   #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
 
-  # Example resource route (maps HTTP verbs to controller actions automatically):
+  # Example resource route:
   #   resources :products
 
   # Example resource route with options:

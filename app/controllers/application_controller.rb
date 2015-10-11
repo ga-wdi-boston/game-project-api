@@ -9,7 +9,7 @@ class ApplicationController < ActionController::Base
   protected
 
   def ssl_configured?
-    !Rails.env.development?
+    false && !Rails.env.development?
   end
 
   def json_request?
@@ -17,5 +17,4 @@ class ApplicationController < ActionController::Base
     # request.format.json?
     request.format = :json
   end
-
 end

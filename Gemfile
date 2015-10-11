@@ -1,28 +1,23 @@
 source 'https://rubygems.org'
-ruby '2.2.2'
+ruby '2.2.4'
 
-# Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.2.1'
+# Use rails as an api
+gem 'rails', '4.2.5.1'
+gem 'rails-api'
+
 # Use postgresql as the database for Active Record
 gem 'pg'
-# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem 'jbuilder', '~> 2.0'
-# bundle exec rake doc:rails generates the API under doc/api.
-gem 'sdoc', '~> 0.4.0', group: :doc
 
 # Use ActiveModel has_secure_password
-gem 'bcrypt', '~> 3.1.7'
+gem 'bcrypt', '~> 3.1.10'
 
-# Use Unicorn as the app server
-# gem 'unicorn'
-
+# Use Puma as the app server
 gem 'puma'
 
-# Use Capistrano for deployment
-# gem 'capistrano-rails', group: :development
-
+# Cross origin resource sharing
 gem 'rack-cors', require: 'rack/cors'
 
+# Serializers
 gem 'active_model_serializers'
 
 group :production do
@@ -30,13 +25,7 @@ group :production do
 end
 
 group :development, :test do
-  # Call 'byebug' anywhere to stop execution and get a debugger console
   gem 'byebug'
-
   gem 'pry-rails'
-
   gem 'rb-readline'
-
-  # Access an IRB console on exception pages or by using <%= console %> in views
-  gem 'web-console', '~> 2.0'
 end

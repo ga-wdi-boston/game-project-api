@@ -5,17 +5,11 @@ module Authentication
   #
   module ClassMethods
     def authenticate(email, password)
-      user = find_by email: email
-      user if user && user.authenticate(password)
+      user = find_by(email: email)
+      return unless user
+      user.send :new_token
+      user.authenticate password
     end
-
-    def by_token(token)
-      find_by token: token
-    end
-  end
-
-  def authenticate_with_new_token(password)
-    authenticate_without_new_token(password) && new_token
   end
 
   included do
@@ -23,12 +17,13 @@ module Authentication
     before_create :set_token
     after_find :fix_up_token
     validates :email, uniqueness: true
-    alias_method_chain :authenticate, :new_token
   end
 
-  private
+  def logout
+    new_token
+  end
 
-  # FIXME: Validate that token doesn't exist? (improbable)
+  # FIXME: Do I need to validate that token doesn't exist? (improbable)
   def set_token
     self.token = SecureRandom.hex(16)
   end
@@ -41,6 +36,8 @@ module Authentication
   # expire old token
   def fix_up_token
     # FIXME: token age should be configurable
-    new_token if updated_at < 7.day.ago
+    new_token if updated_at < 7.days.ago
   end
+
+  private :set_token, :new_token, :fix_up_token
 end
