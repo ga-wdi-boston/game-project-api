@@ -2,7 +2,7 @@
 
 # A Tic-tac-toe data store API
 
-An API to store tic-tac-toe game state and let two players compete across the internet.  It allows players to register as uses of the API and play against other registered users.
+An API to store tic-tac-toe game state and let two players compete across the internet.  It allows players to register as users of the API and play against other registered users.
 
 The API does not currently validate game states.
 
