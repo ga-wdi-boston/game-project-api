@@ -271,7 +271,7 @@ If there are no games associated with the user, the response body will contain a
 ```
 
 ### create
-The `create` action expects a *POST* with an empty request body.  If the request is successful, the response will have an HTTP Status of 201, Created, and the body will contain JSON of the created game with `player_x` set to the user calling `create`, e.g.:
+The `create` action expects a *POST* with an empty JSON request body, `{}`.  If the request is successful, the response will have an HTTP Status of 201, Created, and the body will contain JSON of the created game with `player_x` set to the user calling `create`, e.g.:
 ```json
 {
   "game": {
@@ -311,7 +311,7 @@ The `show` action is a *GET* specifing the `id` of the game to retrieve.  If the
 ### update
 
 #### join a game as player 'o'
-This `update` action expects an empty *PATCH*, to join an existing game.
+This `update` action expects an empty JSON, `{}` *PATCH*, to join an existing game.
 
 If the request is successful, the response will have an HTTP Status of 200, OK, and the body will be JSON containing the game joined, e.g.:
 ```json
