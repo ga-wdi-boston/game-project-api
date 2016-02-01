@@ -1,9 +1,9 @@
 #
 class UsersController < ProtectedController
-  skip_before_action :authenticate, only: [:login, :create]
+  skip_before_action :authenticate, only: [:signup, :signin]
 
   # POST '/sign-up'
-  def create
+  def signup
     user = User.create(user_creds)
     if user.valid?
       render json: user, status: :created
@@ -65,7 +65,7 @@ class UsersController < ProtectedController
   end
 
   def pw_creds
-    params.require(:password)
+    params.require(:passwords)
       .permit(:old, :new)
   end
 

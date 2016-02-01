@@ -1,9 +1,9 @@
 Rails.application.routes.draw do
   # root 'welcome#index'
 
-  post '/sign-up' => 'users#create'
-  post '/sign-in' => 'users#login'
-  delete '/sign-out/:id' => 'users#logout'
+  post '/sign-up' => 'users#signup'
+  post '/sign-in' => 'users#signin'
+  delete '/sign-out/:id' => 'users#signout'
   patch '/change-password/:id' => 'users#changepw'
   resources :users, only: [:index, :show]
 

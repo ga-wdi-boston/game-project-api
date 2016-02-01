@@ -10,7 +10,7 @@ The API does not currently validate game states.
 
 Verb   | URI Pattern        | Controller#Action
 ----   | -----------        | -----------------
-POST   | `/sign-up`         | `users#create`
+POST   | `/sign-up`         | `users#signup`
 POST   | `/sign-in`         | `users#signin`
 DELETE | `/sign-out/:id`    | `users#signout`
 PATCH  | `/change-password` | `users#changepw`
@@ -88,16 +88,15 @@ All data returned from API actions is formatted as JSON.
 </tr>
 </table>
 
-### create
+### signup
 
 The `create` action expects a *POST* of `credentials` identifying a new user to create, e.g. using `FormData`:
 
 ```html
-<form id="sign-up">
-  <input name="credentials[email]" type="text" placeholder="email">
-  <input name="credentials[password]" type="password" placeholder="password">
-  <input name="credentials[password_confirmation]" type="password" placeholder="password confirmation">
-  <input name="sign-up" type="submit" value="Sign Up">
+<form>
+  <input name="credentials[email]" type="text" value="an@example.email">
+  <input name="credentials[password]" type="password" value="an example password">
+  <input name="credentials[password_confirmation]" type="password" value="an example password">
 </form>
 
 ```
@@ -117,6 +116,7 @@ or using `JSON`:
 The `password_confirmation` field is optional.
 
 If the request is successful, the response will have an HTTP Status of 201, Created, and the body will be JSON containing the `id` and `email` of the new user, e.g.:
+
 ```json
 {
   "user": {
@@ -125,6 +125,7 @@ If the request is successful, the response will have an HTTP Status of 201, Crea
   }
 }
 ```
+
 If the request is unsuccessful, the response will have an HTTP Status of 400 Bad Request, and the response body will be empty.
 
 ### signin
@@ -132,10 +133,9 @@ If the request is unsuccessful, the response will have an HTTP Status of 400 Bad
 The `signin` action expects a *POST* with `credentials` identifying a previously registered user, e.g.:
 
 ```html
-<form id="sign-in">
-  <input name="credentials[email]" type="text" placeholder="email">
-  <input name="credentials[password]" type="password" placeholder="password">
-  <input name="sign-in" type="submit" value="Sign In">
+<form>
+  <input name="credentials[email]" type="text" value="an@example.email">
+  <input name="credentials[password]" type="password" value="an example password">
 </form>
 ```
 
@@ -165,7 +165,21 @@ If the request is unsuccessful, the response will have an HTTP Status of 401 Una
 
 ### signout
 
+The `signout` actions is a *DELETE* specifying the `id` of the user so sign out.
+
+If the request is successful the response will have an HTTP status of 204 No Content.
+
+If the request is unsuccessful, the response will have a status of 401 Unauthorized.
+
 ### changepw
+
+The `changepw` action expects a PATCH of `passwords` specifying the `old` and `new`.
+
+If the request is successful the response will have an HTTP status of 204 No Content.
+
+If the request is unsuccessful the reponse will have an HTTP status of 400 Bad Request.
+
+---
 
 The `sign-out` and `change-password` requests must include a valid HTTP header `Authorization: Token token=<token>` or they will be rejected with a status of 401 Unauthorized.
 
@@ -320,9 +334,11 @@ The `index` action is a *GET* that retrieves all the games associated with a use
   ]
 }
 ```
+
 If the `over` query parameter is specified the results will be restricted accordingly.
 
 If there are no games associated with the user, the response body will contain an empty games array, e.g.:
+
 ```json
 {
   "games": [
@@ -331,7 +347,9 @@ If there are no games associated with the user, the response body will contain a
 ```
 
 ### create
-The `create` action expects a *POST* with an empty JSON request body, `{}`.  If the request is successful, the response will have an HTTP Status of 201, Created, and the body will contain JSON of the created game with `player_x` set to the user calling `create`, e.g.:
+
+The `create` action expects a *POST* with an empty body (e.g `new FormData()` or `''` - if JSON,  `'{}'`).  If the request is successful, the response will have an HTTP Status of 201, Created, and the body will contain JSON of the created game with `player_x` set to the user calling `create`, e.g.:
+
 ```json
 {
   "game": {
@@ -346,10 +364,13 @@ The `create` action expects a *POST* with an empty JSON request body, `{}`.  If 
   }
 }
 ```
+
 If the request is unsuccessful, the response will have an HTTP Status of 400 Bad Request, and the response body will be JSON describing the errors.
 
 ### show
+
 The `show` action is a *GET* specifing the `id` of the game to retrieve.  If the request is successful the status will be 200, OK, and the response body will contain JSON for the game requested, e.g.:
+
 ```json
 {
   "game": {
@@ -371,9 +392,10 @@ The `show` action is a *GET* specifing the `id` of the game to retrieve.  If the
 ### update
 
 #### join a game as player 'o'
-This `update` action expects an empty JSON, `{}` *PATCH*, to join an existing game.
+This `update` action expects an empty (e.g `new FormData()` or `''` - if JSON,  `'{}'`) *PATCH* to join an existing game.
 
 If the request is successful, the response will have an HTTP Status of 200, OK, and the body will be JSON containing the game joined, e.g.:
+
 ```json
 {
   "game": {
@@ -392,10 +414,21 @@ If the request is successful, the response will have an HTTP Status of 200, OK, 
   }
 }
 ```
+
 If the request is unsuccessful, the response will have an HTTP Status of 400 Bad Request, and the response body will be empty (game cannot be joined, player_o already set or user making request is player_x) or JSON describing the errors.
 
 #### update a game's states
+
 This `update` action expects a *PATCH* with changes to to an existing game, e.g.:
+
+```html
+<form>
+  <input name="game[cell][index]" type="text" value="0">
+  <input name="game[cell][value]" type="text" value="x">
+  <input name="game[over]" type="text" value="false">
+</form>
+```
+
 ```json
 {
   "game": {
@@ -407,7 +440,9 @@ This `update` action expects a *PATCH* with changes to to an existing game, e.g.
   }
 }
 ```
+
 If the request is successful, the response will have an HTTP Status of 200, OK, and the body will be JSON containing the modified game, e.g.:
+
 ```json
 {
   "game": {
@@ -426,13 +461,14 @@ If the request is successful, the response will have an HTTP Status of 200, OK, 
   }
 }
 ```
+
 If the request is unsuccessful, the response will have an HTTP Status of 400 Bad Request, and the response body will be JSON describing the errors.
 
 ### watch
 
 The `watch` action is handled differently than all the others.  Because `watch` implements a streaming source of data, we'll use a wrapper around the html5 object EventSource to handle the events sent.
 
-You can find the wrapper [here](public/js/resource-watcher-0.1.0.js).  The wraper is also available from the deployed app at the path `/js/resource-watcher-0.1.0.js`.
+You can find the wrapper [here](public/js/resource-watcher-0.1.0.js).  The wrapper is also available from the deployed app at the path `/js/resource-watcher-0.1.0.js`.
 
 The events that watch implements let you know when a game has been updated.  By using this interface you can write code that lets a player see another's move almost as it happens.  Updates to the game from one player's browser are sent to the other's browser.
 
@@ -444,6 +480,7 @@ var gameWatcher = resourceWatcher('<server>/games/:id/watch', {
       timeout: <timeout>]
 });
 ```
+
 The watched resource has a default timeout of 120 seconds.
 
 You should add a handler for `change` and `error` events.  The error events are not the most informative.  The change event may return a timeout.
@@ -460,7 +497,13 @@ game.on('change', function(d){
   var index = cell.index
   var value = cell.value;
 });
+
 game.on('error', function(e){
   console.error(e);
 });
 ```
+
+## [License](LICENSE)
+
+Source code distributed under the MIT license. Text and other assets copyright
+General Assembly, Inc., all rights reserved.
