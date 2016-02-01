@@ -2,7 +2,7 @@
 class UsersController < ProtectedController
   skip_before_action :authenticate, only: [:login, :create]
 
-  # POST '/signup'
+  # POST '/sign-up'
   def create
     user = User.create(user_creds)
     if user.valid?
@@ -12,12 +12,22 @@ class UsersController < ProtectedController
     end
   end
 
-  # POST '/signin'
-  def login
+  # POST '/sign-in'
+  def signin
     creds = user_creds
     if (user = User.authenticate creds[:email],
                                  creds[:password])
       render json: user, serializer: UserLoginSerializer, root: 'user'
+    else
+      head :unauthorized
+    end
+  end
+
+  # DELETE '/sign-out/1'
+  def signout
+    if current_user == User.find(params[:id])
+      current_user.logout
+      head :no_content
     else
       head :unauthorized
     end
@@ -31,16 +41,6 @@ class UsersController < ProtectedController
       head :bad_request
     else
       head :no_content
-    end
-  end
-
-  # DELETE '/signout/1'
-  def logout
-    if current_user == User.find(params[:id])
-      current_user.logout
-      head :no_content
-    else
-      head :unauthorized
     end
   end
 

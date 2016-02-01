@@ -8,18 +8,20 @@ The API does not currently validate game states.
 
 ## API end-points
 
-Verb  | URI Pattern        | Controller#Action
-----  | -----------        | -----------------
-POST  | `/login`           | `users#login`
-POST  | `/users`           | `users#create`
-GET   | `/games`           | `games#index`
-POST  | `/games`           | `games#create`
-GET   | `/games/:id`       | `games#show`
-PATCH | `/games/:id`       | `games#update`
-GET   | `/games/:id/watch` | `games#watch`
+Verb   | URI Pattern        | Controller#Action
+----   | -----------        | -----------------
+POST   | `/sign-up`         | `users#create`
+POST   | `/sign-in`         | `users#signin`
+DELETE | `/sign-out/:id`    | `users#signout`
+PATCH  | `/change-password` | `users#changepw`
+GET    | `/games`           | `games#index`
+POST   | `/games`           | `games#create`
+GET    | `/games/:id`       | `games#show`
+PATCH  | `/games/:id`       | `games#update`
+GET    | `/games/:id/watch` | `games#watch`
 
 
-All API actions that expect data in the request body require JSON,  `Content-Type:application/json; charset=utf-8`, and returned data in the response body, if any, will also be JSON.
+All data returned from API actions is formatted as JSON.
 
 ---
 ## User actions
@@ -38,33 +40,106 @@ All API actions that expect data in the request body require JSON,  `Content-Typ
 </tr>
 <tr>
 <td>POST</td>
-<td>`/login`</td>
-<td><strong>credentials</strong></td>
-<td>200, OK</td>
-<td><strong>token</strong></td>
-</tr>
-<tr>
-  <td colspan="3"></td>
-  <td>401, Unauthorized</td>
-  <td><em>empty</em></td>
-</tr>
-<tr>
-<td>POST</td>
-<td>`/users`</td>
+<td>`/sign-up`</td>
 <td><strong>credentials</strong></td>
 <td>201, Created</td>
 <td><strong>user</strong></td>
 </tr>
 <tr>
   <td colspan="3"></td>
-  <td>400, Bad Request</td>
+  <td>400 Bad Request</td>
+  <td><em>empty</em></td>
+</tr>
+<tr>
+<td>POST</td>
+<td>`/sign-in`</td>
+<td><strong>credentials</strong></td>
+<td>200 OK</td>
+<td><strong>user w/token</strong></td>
+</tr>
+<tr>
+  <td colspan="3"></td>
+  <td>401 Unauthorized</td>
+  <td><em>empty</em></td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>`/sign-out/:id`</td>
+<td>empty</td>
+<td>201 Created</td>
+<td>empty</td>
+</tr>
+<tr>
+  <td colspan="3"></td>
+  <td>401 Unauthorized</td>
+  <td><em>empty</em></td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td>`/change-password/:id`</td>
+<td><strong>passwords</strong></td>
+<td>204 No Content</td>
+<td><strong>user w/token</strong></td>
+</tr>
+<tr>
+  <td colspan="3"></td>
+  <td>400 Bad Request</td>
   <td><em>empty</em></td>
 </tr>
 </table>
 
-### login
+### create
 
-The `login` action expects a *POST* with `credentials` identifying a previously registered user, e.g.:
+The `create` action expects a *POST* of `credentials` identifying a new user to create, e.g. using `FormData`:
+
+```html
+<form id="sign-up">
+  <input name="credentials[email]" type="text" placeholder="email">
+  <input name="credentials[password]" type="password" placeholder="password">
+  <input name="credentials[password_confirmation]" type="password" placeholder="password confirmation">
+  <input name="sign-up" type="submit" value="Sign Up">
+</form>
+
+```
+
+or using `JSON`:
+
+```json
+{
+  "credentials": {
+    "email": "an@example.email",
+    "password": "an example password",
+    "password_confirmation": "an example password"
+  }
+}
+```
+
+The `password_confirmation` field is optional.
+
+If the request is successful, the response will have an HTTP Status of 201, Created, and the body will be JSON containing the `id` and `email` of the new user, e.g.:
+```json
+{
+  "user": {
+    "id": 1,
+    "email": "an@example.email"
+  }
+}
+```
+If the request is unsuccessful, the response will have an HTTP Status of 400 Bad Request, and the response body will be empty.
+
+### signin
+
+The `signin` action expects a *POST* with `credentials` identifying a previously registered user, e.g.:
+
+```html
+<form id="sign-in">
+  <input name="credentials[email]" type="text" placeholder="email">
+  <input name="credentials[password]" type="password" placeholder="password">
+  <input name="sign-in" type="submit" value="Sign In">
+</form>
+```
+
+or:
 
 ```json
 {
@@ -86,34 +161,19 @@ If the request is successful, the response will have an HTTP Status of 200, OK, 
 }
 ```
 
-If the request is unsuccessful, the response will have an HTTP Status of 401, Unauthorized, and the response body will be empty.
+If the request is unsuccessful, the response will have an HTTP Status of 401 Unauthorized, and the response body will be empty.
 
-### create
+### signout
 
-The `create` action expects a *POST* of `credentials` identifying a new user to create, e.g.:
-```json
-{
-  "credentials": {
-    "email": "an@example.email",
-    "password": "an example password",
-    "password_confirmation": "an example password"
-  }
-}
-```
+### changepw
 
-If the request is successful, the response will have an HTTP Status of 201, Created, and the body will be JSON containing the `id` and `email` of the new user, e.g.:
-```json
-{
-  "user": {
-    "id": 1,
-    "email": "an@example.email"
-  }
-}
-```
-If the request is unsuccessful, the response will have an HTTP Status of 400, Bad Request, and the response body will be empty.
+The `sign-out` and `change-password` requests must include a valid HTTP header `Authorization: Token token=<token>` or they will be rejected with a status of 401 Unauthorized.
 
 ## Game actions
-All games action requests must include a valid HTTP header `Authorization: Token token=<token>` or they will be rejected with a status of 401, Unauthorized.
+
+All games action requests must include a valid HTTP header `Authorization: Token token=<token>` or they will be rejected with a status of 401 Unauthorized.
+
+All of the game actions, except for `watch`, follow the _RESTful_ style.
 
 Games are associated with users, `player_x` and `player_o`.  Actions, other than update, will only retrieve a game if the user associated with the `Authorization` header is one of those two users.  If this requirement is unmet, the response will be 404, Not Found, except for the index action which will return an empty games array.
 
@@ -148,7 +208,7 @@ Games are associated with users, `player_x` and `player_o`.  Actions, other than
   <td colspan="3">
   The default is to retrieve all games associated with the user..
   </td>
-  <td>401, Unauthorized</td>
+  <td>401 Unauthorized</td>
   <td><em>empty</em></td>
 </tr>
 <tr>
@@ -161,13 +221,13 @@ Games are associated with users, `player_x` and `player_o`.  Actions, other than
 <tr>
   <td colspan="3">
   </td>
-  <td>401, Unauthorized</td>
+  <td>401 Unauthorized</td>
   <td><em>empty</em></td>
 </tr>
 <tr>
   <td colspan="3">
   </td>
-  <td>400, Bad Request</td>
+  <td>400 Bad Request</td>
   <td><strong>errors</strong></td>
 </tr>
 <tr>
@@ -180,7 +240,7 @@ Games are associated with users, `player_x` and `player_o`.  Actions, other than
 <tr>
   <td colspan="3">
   </td>
-  <td>401, Unauthorized</td>
+  <td>401 Unauthorized</td>
   <td><em>empty</em></td>
 </tr>
 <tr>
@@ -198,12 +258,12 @@ Games are associated with users, `player_x` and `player_o`.  Actions, other than
 </tr>
 <tr>
   <td colspan="3"></td>
-  <td>400, Bad Request</td>
+  <td>400 Bad Request</td>
   <td><strong>errors</strong></td>
 </tr>
 <tr>
   <td colspan="3"></td>
-  <td>400, Bad Request</td>
+  <td>400 Bad Request</td>
   <td><em>empty</em></td>
 </tr>
 <tr>
@@ -215,7 +275,7 @@ Games are associated with users, `player_x` and `player_o`.  Actions, other than
 </tr>
 <tr>
   <td colspan="3"></td>
-  <td>400, Bad Request</td>
+  <td>400 Bad Request</td>
   <td><strong>errors</strong></td>
 </tr>
 <tr>
@@ -286,7 +346,7 @@ The `create` action expects a *POST* with an empty JSON request body, `{}`.  If 
   }
 }
 ```
-If the request is unsuccessful, the response will have an HTTP Status of 400, Bad Request, and the response body will be JSON describing the errors.
+If the request is unsuccessful, the response will have an HTTP Status of 400 Bad Request, and the response body will be JSON describing the errors.
 
 ### show
 The `show` action is a *GET* specifing the `id` of the game to retrieve.  If the request is successful the status will be 200, OK, and the response body will contain JSON for the game requested, e.g.:
@@ -332,7 +392,7 @@ If the request is successful, the response will have an HTTP Status of 200, OK, 
   }
 }
 ```
-If the request is unsuccessful, the response will have an HTTP Status of 400, Bad Request, and the response body will be empty (game cannot be joined, player_o already set or user making request is player_x) or JSON describing the errors.
+If the request is unsuccessful, the response will have an HTTP Status of 400 Bad Request, and the response body will be empty (game cannot be joined, player_o already set or user making request is player_x) or JSON describing the errors.
 
 #### update a game's states
 This `update` action expects a *PATCH* with changes to to an existing game, e.g.:
@@ -366,7 +426,7 @@ If the request is successful, the response will have an HTTP Status of 200, OK, 
   }
 }
 ```
-If the request is unsuccessful, the response will have an HTTP Status of 400, Bad Request, and the response body will be JSON describing the errors.
+If the request is unsuccessful, the response will have an HTTP Status of 400 Bad Request, and the response body will be JSON describing the errors.
 
 ### watch
 
