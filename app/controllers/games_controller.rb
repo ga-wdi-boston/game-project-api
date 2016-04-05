@@ -51,7 +51,7 @@ class GamesController < ProtectedController
     end
   end
 
-  HEARTBEAT = 5
+  HEARTBEAT = 30
 
   def start_heartbeat
     Thread.new do
