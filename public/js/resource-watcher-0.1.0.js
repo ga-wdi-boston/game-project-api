@@ -17,7 +17,7 @@ var resourceWatcher = function(url, conf) {
       if (close) {
         close();
       }
-      return handler(e.data ? e.data : e);
+      return handler(e.data ? JSON.parse(e.data) : e);
     };
   };
 

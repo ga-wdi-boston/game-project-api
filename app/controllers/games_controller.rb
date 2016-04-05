@@ -51,27 +51,54 @@ class GamesController < ProtectedController
     end
   end
 
-  public
+  HEARTBEAT = 5
 
-  # rubocop:disable Metrics/MethodLength
-  # rubocop:disable Metrics/AbcSize
+  def start_heartbeat
+    Thread.new do
+      count = 0
+      until @queue.closed?
+        @queue.push heartbeat: count += 1
+        sleep HEARTBEAT
+      end
+    end
+  end
+
+  def handle_notify
+    @game.listen_for_update(@timeout) do |data|
+      @queue.push data_for_watch(data)
+    end
+    @queue.push timeout: 'watch timed out'
+  end
+
+  def start_notify
+    Thread.new do
+      handle_notify
+    end
+  end
+
+public
+
   def watch
-    game = base_query.where(over: false).find(params[:id])
-    timeout = params[:timeout] ? params[:timeout].to_i : 120
+    @queue = Queue.new
+    @game = base_query.where(over: false).find(params[:id])
+    @timeout = params[:timeout] ? params[:timeout].to_i : 120
+    heartbeat = start_heartbeat
+    notify = start_notify
     response.headers['Content-Type'] = 'text/event-stream'
     sse = SSE.new(response.stream)
     begin
-      game.listen_for_update(timeout) do |data|
-        sse.write(data_for_watch data)
+      until @queue.closed?
+        event = @queue.pop
+        sse.write event
       end
-      sse.write(timeout: 'watch timed out')
     rescue IOError, ClientDisconnected => e
       logger.info e.to_s + ': ' + Time.now.to_s
     ensure
       logger.info 'Streaming thread stopped: ' + Time.now.to_s
       sse.close
     end
-    render nothing: true
+    notify.join
+    heartbeat.join
   end
 
   def index
