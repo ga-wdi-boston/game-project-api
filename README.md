@@ -8,17 +8,17 @@ The API does not currently validate game states.
 
 ## API end-points
 
-Verb   | URI Pattern        | Controller#Action
-----   | -----------        | -----------------
-POST   | `/sign-up`         | `users#signup`
-POST   | `/sign-in`         | `users#signin`
-DELETE | `/sign-out/:id`    | `users#signout`
-PATCH  | `/change-password` | `users#changepw`
-GET    | `/games`           | `games#index`
-POST   | `/games`           | `games#create`
-GET    | `/games/:id`       | `games#show`
-PATCH  | `/games/:id`       | `games#update`
-GET    | `/games/:id/watch` | `games#watch`
+Verb   | URI Pattern            | Controller#Action
+----   | -----------            | -----------------
+POST   | `/sign-up`             | `users#signup`
+POST   | `/sign-in`             | `users#signin`
+DELETE | `/sign-out/:id`        | `users#signout`
+PATCH  | `/change-password/:id` | `users#changepw`
+GET    | `/games`               | `games#index`
+POST   | `/games`               | `games#create`
+GET    | `/games/:id`           | `games#show`
+PATCH  | `/games/:id`           | `games#update`
+GET    | `/games/:id/watch`     | `games#watch`
 
 
 All data returned from API actions is formatted as JSON.
