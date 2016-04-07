@@ -475,7 +475,7 @@ The events that watch implements let you know when a game has been updated.  By 
 You create a watcher object using the resourceWatcher function.  This function takes two parameters, the watch url and a configuration object which must contain the Authorization token, and may contain an optional timeout in seconds, e.g.:
 
 ```js
-var gameWatcher = resourceWatcher('<server>/games/:id/watch', {
+let gameWatcher = resourceWatcher('<server>/games/:id/watch', {
       Authorization: 'Token token=<token>'[,
       timeout: <timeout>]
 });
@@ -483,23 +483,26 @@ var gameWatcher = resourceWatcher('<server>/games/:id/watch', {
 
 The watched resource has a default timeout of 120 seconds.
 
-You should add a handler for `change` and `error` events.  The error events are not the most informative.  The change event may return a timeout.
+You should add a handler for `change` and `error` events.  The error events are not the most informative.  The change event may return a timeout or a heartbeat.
 
 ```js
-game.on('change', function(d){
-  var data = JSON.parse(d);
+gameWatcher.on('change', function (data) {
   if (data.timeout) { //not an error
-    game.close();
+    gameWatcher.close();
     return console.warn(data.timeout);
+  } else if (data.game && data.game.cell) {
+    let game = data.game;
+    let cell = game.cell;
+    $('#watch-index').val(cell.index);
+    $('#watch-value').val(cell.value);
+  } else {
+    console.log(data);
   }
-  var gameData = data.game;
-  var cell = gameData.cell;
-  var index = cell.index
-  var value = cell.value;
+
 });
 
-game.on('error', function(e){
-  console.error(e);
+gameWatcher.on('error', function (e) {
+  console.error('an error has occurred with the stream', e);
 });
 ```
 
