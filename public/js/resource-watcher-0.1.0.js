@@ -1,27 +1,30 @@
 'use strict';
-var resourceWatcher = function(url, conf) {
-  var token = function(conf) {
+const resourceWatcher = function (url, conf) {
+  let token = function (conf) {
     return conf && (conf = conf.Authorization) &&
       (conf = typeof conf === 'string' &&
         conf.split('=')) &&
       Array.isArray(conf) && conf[1];
   };
+
   url += '?token=' + token(conf);
   url += conf.timeout ? '&timeout=' + conf.timeout : '';
-  var es = new EventSource(url);
-  var close = function() {
+  let es = new EventSource(url); //jshint ignore: line
+  let close = function () {
     es.close();
   };
-  var makeHandler = function(handler, close) {
-    return function(e) {
+
+  const makeHandler = function (handler, close) {
+    return function (e) {
       if (close) {
         close();
       }
+
       return handler(e.data ? JSON.parse(e.data) : e);
     };
   };
 
-  var on = function(event, handler) {
+  const on = function (event, handler) {
     switch (event) {
       case 'connect':
         es.onopen = makeHandler(handler);
@@ -40,6 +43,6 @@ var resourceWatcher = function(url, conf) {
 
   return {
     close: close,
-    on: on
+    on: on,
   };
 };
