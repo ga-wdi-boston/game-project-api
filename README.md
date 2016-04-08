@@ -2,30 +2,35 @@
 
 # A Tic-tac-toe data store API
 
-An API to store tic-tac-toe game state and let two players compete across the internet.  It allows players to register as users of the API and play against other registered users.
+An API to store tic-tac-toe game state and let two players compete across the
+ internet.
+It allows players to register as users of the API and play against other
+ registered users.
 
 The API does not currently validate game states.
 
 ## API end-points
 
-Verb   | URI Pattern            | Controller#Action
-----   | -----------            | -----------------
-POST   | `/sign-up`             | `users#signup`
-POST   | `/sign-in`             | `users#signin`
-DELETE | `/sign-out/:id`        | `users#signout`
-PATCH  | `/change-password/:id` | `users#changepw`
-GET    | `/games`               | `games#index`
-POST   | `/games`               | `games#create`
-GET    | `/games/:id`           | `games#show`
-PATCH  | `/games/:id`           | `games#update`
-GET    | `/games/:id/watch`     | `games#watch`
-
+| Verb   | URI Pattern            | Controller#Action |
+| ----   | -----------            | ----------------- |
+| POST   | `/sign-up`             | `users#signup`    |
+| POST   | `/sign-in`             | `users#signin`    |
+| DELETE | `/sign-out/:id`        | `users#signout`   |
+| PATCH  | `/change-password/:id` | `users#changepw`  |
+| GET    | `/games`               | `games#index`     |
+| POST   | `/games`               | `games#create`    |
+| GET    | `/games/:id`           | `games#show`      |
+| PATCH  | `/games/:id`           | `games#update`    |
+| GET    | `/games/:id/watch`     | `games#watch`     |
 
 All data returned from API actions is formatted as JSON.
 
 ---
+
 ## User actions
+
 *Summary:*
+
 <table>
 <tr>
   <th colspan="3">Request</th>
@@ -90,7 +95,8 @@ All data returned from API actions is formatted as JSON.
 
 ### signup
 
-The `create` action expects a *POST* of `credentials` identifying a new user to create, e.g. using `getFormFields`:
+The `create` action expects a *POST* of `credentials` identifying a new user to
+ create, e.g. using `getFormFields`:
 
 ```html
 <form>
@@ -115,7 +121,9 @@ or using `JSON`:
 
 The `password_confirmation` field is optional.
 
-If the request is successful, the response will have an HTTP Status of 201, Created, and the body will be JSON containing the `id` and `email` of the new user, e.g.:
+If the request is successful, the response will have an HTTP Status of 201,
+ Created, and the body will be JSON containing the `id` and `email` of the new
+ user, e.g.:
 
 ```json
 {
@@ -126,11 +134,13 @@ If the request is successful, the response will have an HTTP Status of 201, Crea
 }
 ```
 
-If the request is unsuccessful, the response will have an HTTP Status of 400 Bad Request, and the response body will be empty.
+If the request is unsuccessful, the response will have an HTTP Status of 400 Bad
+ Request, and the response body will be empty.
 
 ### signin
 
-The `signin` action expects a *POST* with `credentials` identifying a previously registered user, e.g.:
+The `signin` action expects a *POST* with `credentials` identifying a previously
+ registered user, e.g.:
 
 ```html
 <form>
@@ -150,7 +160,10 @@ or:
 }
 ```
 
-If the request is successful, the response will have an HTTP Status of 200, OK, and the body will be JSON containing the user's `id`, `email`, and the `token` used to authenticate other requests, e.g.:
+If the request is successful, the response will have an HTTP Status of 200 OK,
+ and the body will be JSON containing the user's `id`, `email`, and the `token`
+ used to authenticate other requests, e.g.:
+
 ```json
 {
   "user": {
@@ -161,37 +174,51 @@ If the request is successful, the response will have an HTTP Status of 200, OK, 
 }
 ```
 
-If the request is unsuccessful, the response will have an HTTP Status of 401 Unauthorized, and the response body will be empty.
+If the request is unsuccessful, the response will have an HTTP Status of 401
+ Unauthorized, and the response body will be empty.
 
 ### signout
 
 The `signout` actions is a *DELETE* specifying the `id` of the user so sign out.
 
-If the request is successful the response will have an HTTP status of 204 No Content.
+If the request is successful the response will have an HTTP status of 204 No
+ Content.
 
-If the request is unsuccessful, the response will have a status of 401 Unauthorized.
+If the request is unsuccessful, the response will have a status of 401
+ Unauthorized.
 
 ### changepw
 
-The `changepw` action expects a PATCH of `passwords` specifying the `old` and `new`.
+The `changepw` action expects a PATCH of `passwords` specifying the `old` and
+ `new`.
 
-If the request is successful the response will have an HTTP status of 204 No Content.
+If the request is successful the response will have an HTTP status of 204 No
+ Content.
 
-If the request is unsuccessful the reponse will have an HTTP status of 400 Bad Request.
+If the request is unsuccessful the reponse will have an HTTP status of 400 Bad
+ Request.
 
 ---
 
-The `sign-out` and `change-password` requests must include a valid HTTP header `Authorization: Token token=<token>` or they will be rejected with a status of 401 Unauthorized.
+The `sign-out` and `change-password` requests must include a valid HTTP header
+ `Authorization: Token token=<token>` or they will be rejected with a status of
+ 401 Unauthorized.
 
 ## Game actions
 
-All games action requests must include a valid HTTP header `Authorization: Token token=<token>` or they will be rejected with a status of 401 Unauthorized.
+All games action requests must include a valid HTTP header `Authorization: Token
+ token=<token>` or they will be rejected with a status of 401 Unauthorized.
 
-All of the game actions, except for `watch`, follow the _RESTful_ style.
+All of the game actions, except for `watch`, follow the *RESTful* style.
 
-Games are associated with users, `player_x` and `player_o`.  Actions, other than update, will only retrieve a game if the user associated with the `Authorization` header is one of those two users.  If this requirement is unmet, the response will be 404, Not Found, except for the index action which will return an empty games array.
+Games are associated with users, `player_x` and `player_o`.
+Actions, other than update, will only retrieve a game if the user associated
+ with the `Authorization` header is one of those two users.
+If this requirement is unmet, the response will be 404 Not Found, except for
+ the index action which will return an empty games array.
 
 *Summary:*
+
 <table>
 <tr>
   <th colspan="3">Request</th>
@@ -213,7 +240,8 @@ Games are associated with users, `player_x` and `player_o`.  Actions, other than
 </tr>
 <tr>
   <td colspan="3">
-  The optional `over` query parameter restricts the response to games with a matching `over` property.
+  The optional `over` query parameter restricts the response to games with a
+   matching `over` property.
   </td>
   <td>200, OK</td>
   <td><em>empty games</em></td>
@@ -260,7 +288,7 @@ Games are associated with users, `player_x` and `player_o`.  Actions, other than
 <tr>
   <td colspan="3">
   </td>
-  <td>404, Not Found</td>
+  <td>404 Not Found</td>
   <td><em>empty</em></td>
 </tr>
 <tr>
@@ -294,13 +322,16 @@ Games are associated with users, `player_x` and `player_o`.  Actions, other than
 </tr>
 <tr>
   <td colspan="3"></td>
-  <td>404, Not Found</td>
+  <td>404 Not Found</td>
   <td><em>empty</em></td>
 </tr>
 </table>
 
 ### index
-The `index` action is a *GET* that retrieves all the games associated with a user.  The response body will contain JSON containing an array of games, e.g.:
+
+The `index` action is a *GET* that retrieves all the games associated with a
+ user.
+The response body will contain JSON containing an array of games, e.g.:
 
 ```json
 {
@@ -335,9 +366,11 @@ The `index` action is a *GET* that retrieves all the games associated with a use
 }
 ```
 
-If the `over` query parameter is specified the results will be restricted accordingly.
+If the `over` query parameter is specified the results will be restricted
+ accordingly.
 
-If there are no games associated with the user, the response body will contain an empty games array, e.g.:
+If there are no games associated with the user, the response body will contain
+ an empty games array, e.g.:
 
 ```json
 {
@@ -348,7 +381,11 @@ If there are no games associated with the user, the response body will contain a
 
 ### create
 
-The `create` action expects a *POST* with an empty body (e.g `''` or `'{}'` if JSON).  If the request is successful, the response will have an HTTP Status of 201, Created, and the body will contain JSON of the created game with `player_x` set to the user calling `create`, e.g.:
+The `create` action expects a *POST* with an empty body (e.g `''` or `'{}'` if
+ JSON).
+If the request is successful, the response will have an HTTP Status of 201
+ Created, and the body will contain JSON of the created game with `player_x` set
+to the user calling `create`, e.g.:
 
 ```json
 {
@@ -365,11 +402,14 @@ The `create` action expects a *POST* with an empty body (e.g `''` or `'{}'` if J
 }
 ```
 
-If the request is unsuccessful, the response will have an HTTP Status of 400 Bad Request, and the response body will be JSON describing the errors.
+If the request is unsuccessful, the response will have an HTTP Status of 400 Bad
+ Request, and the response body will be JSON describing the errors.
 
 ### show
 
-The `show` action is a *GET* specifing the `id` of the game to retrieve.  If the request is successful the status will be 200, OK, and the response body will contain JSON for the game requested, e.g.:
+The `show` action is a *GET* specifing the `id` of the game to retrieve.
+If the request is successful the status will be 200, OK, and the response body
+ will contain JSON for the game requested, e.g.:
 
 ```json
 {
@@ -392,9 +432,12 @@ The `show` action is a *GET* specifing the `id` of the game to retrieve.  If the
 ### update
 
 #### join a game as player 'o'
-This `update` action expects an empty (e.g `''` or `'{}'` if JSON) *PATCH* to join an existing game.
 
-If the request is successful, the response will have an HTTP Status of 200, OK, and the body will be JSON containing the game joined, e.g.:
+This `update` action expects an empty (e.g `''` or `'{}'` if JSON) *PATCH* to
+ join an existing game.
+
+If the request is successful, the response will have an HTTP Status of 200 OK,
+ and the body will be JSON containing the game joined, e.g.:
 
 ```json
 {
@@ -415,11 +458,14 @@ If the request is successful, the response will have an HTTP Status of 200, OK, 
 }
 ```
 
-If the request is unsuccessful, the response will have an HTTP Status of 400 Bad Request, and the response body will be empty (game cannot be joined, player_o already set or user making request is player_x) or JSON describing the errors.
+If the request is unsuccessful, the response will have an HTTP Status of 400 Bad
+ Request, and the response body will be empty (game cannot be joined, player_o
+ already set or user making request is player_x) or JSON describing the errors.
 
 #### update a game's states
 
-This `update` action expects a *PATCH* with changes to to an existing game, e.g.:
+This `update` action expects a *PATCH* with changes to to an existing game,
+ e.g.:
 
 ```html
 <form>
@@ -441,7 +487,8 @@ This `update` action expects a *PATCH* with changes to to an existing game, e.g.
 }
 ```
 
-If the request is successful, the response will have an HTTP Status of 200, OK, and the body will be JSON containing the modified game, e.g.:
+If the request is successful, the response will have an HTTP Status of 200 OK,
+ and the body will be JSON containing the modified game, e.g.:
 
 ```json
 {
@@ -462,17 +509,28 @@ If the request is successful, the response will have an HTTP Status of 200, OK, 
 }
 ```
 
-If the request is unsuccessful, the response will have an HTTP Status of 400 Bad Request, and the response body will be JSON describing the errors.
+If the request is unsuccessful, the response will have an HTTP Status of 400 Bad
+ Request, and the response body will be JSON describing the errors.
 
 ### watch
 
-The `watch` action is handled differently than all the others.  Because `watch` implements a streaming source of data, we'll use a wrapper around the html5 object EventSource to handle the events sent.
+The `watch` action is handled differently than all the others.  Because `watch`
+ implements a streaming source of data, we'll use a wrapper around the html5
+ object EventSource to handle the events sent.
 
-You can find the wrapper [here](public/js/resource-watcher-0.1.0.js).  The wrapper is also available from the deployed app at the path `/js/resource-watcher-0.1.0.js`.
+You can find the wrapper [here](public/js/resource-watcher-0.1.0.js).
+The wrapper is also available from the deployed app at the path
+ `/js/resource-watcher-0.1.0.js`.
 
-The events that watch implements let you know when a game has been updated.  By using this interface you can write code that lets a player see another's move almost as it happens.  Updates to the game from one player's browser are sent to the other's browser.
+The events that watch implements let you know when a game has been updated.
+By using this interface you can write code that lets a player see another's move
+ almost as it happens.
+Updates to the game from one player's browser are sent to the other's browser.
 
-You create a watcher object using the resourceWatcher function.  This function takes two parameters, the watch url and a configuration object which must contain the Authorization token, and may contain an optional timeout in seconds, e.g.:
+You create a watcher object using the resourceWatcher function.
+This function takes two parameters, the watch url and a configuration object
+ which must contain the Authorization token, and may contain an optional timeout
+ in seconds, e.g.:
 
 ```js
 let gameWatcher = resourceWatcher('<server>/games/:id/watch', {
@@ -483,7 +541,9 @@ let gameWatcher = resourceWatcher('<server>/games/:id/watch', {
 
 The watched resource has a default timeout of 120 seconds.
 
-You should add a handler for `change` and `error` events.  The error events are not the most informative.  The change event may return a timeout or a heartbeat.
+You should add a handler for `change` and `error` events.
+The error events are not the most informative.
+The change event may return a timeout or a heartbeat.
 
 ```js
 gameWatcher.on('change', function (data) {
