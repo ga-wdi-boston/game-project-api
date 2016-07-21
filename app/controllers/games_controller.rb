@@ -26,31 +26,6 @@ class GamesController < ProtectedController
     end
   end
 
-  # rubocop:disable Metrics/AbcSize
-  def data_for_watch(json)
-    data = ActiveSupport::JSON.decode json
-    hash_for_json = {}
-    cells = []
-    if data['cells']
-      before = data['cells'].first
-      after = data['cells'].last
-      before.zip(after).each_with_index do |p, i|
-        cells <<
-          { index: i, value: p.last } if p.first != p.last
-      end
-      hash_for_json[:cell] =
-        cells.length > 1 ? cells : cells.first
-    end
-    hash_for_json[:over] = data['over'] if data['over']
-    hash_for_json[:updatedAt] =
-      data['updated_at'].last.to_datetime.to_s
-    if cells.length > 1
-      { errors: hash_for_json }
-    else
-      { game: hash_for_json }
-    end
-  end
-
   HEARTBEAT = 30
 
   def start_heartbeat
@@ -64,10 +39,11 @@ class GamesController < ProtectedController
   end
 
   def handle_notify
-    @game.listen_for_update(@timeout) do |data|
-      @queue.push data_for_watch(data)
+    @game.listen_for_update(@timeout) do |_event, data|
+      @queue.push data
     end
     @queue.push timeout: 'watch timed out'
+    @queue.close
   end
 
   def start_notify

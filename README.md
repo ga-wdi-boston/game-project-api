@@ -522,7 +522,7 @@ You can find the wrapper [here](public/js/resource-watcher-0.1.0.js).
 The wrapper is also available from the deployed app at the path
  `/js/resource-watcher-0.1.0.js`.
 
-The events that watch implements let you know when a game has been updated.
+The events that `watch` implements let you know when a game has been updated.
 By using this interface you can write code that lets a player see another's move
  almost as it happens.
 Updates to the game from one player's browser are sent to the other's browser.
@@ -539,26 +539,44 @@ let gameWatcher = resourceWatcher('<server>/games/:id/watch', {
 });
 ```
 
-The watched resource has a default timeout of 120 seconds.
+By default, watching a game times-out after 120 seconds.
 
 You should add a handler for `change` and `error` events.
 The error events are not the most informative.
-The change event may return a timeout or a heartbeat.
+The change event may pass to your handler an object with a root key of "timeout"
+or "heartbeat".
+
+Otherwise, it will pass an object with a root key of "game".  Each key in this
+object will contain an array of length 2.  The first element of such an array
+will contain the value for that key before the update.  The last element will
+contain the value after the update.  The code example that follows shows
+handling the most important case, a change to the game board.
 
 ```js
 gameWatcher.on('change', function (data) {
-  if (data.timeout) { //not an error
-    gameWatcher.close();
-    return console.warn(data.timeout);
-  } else if (data.game && data.game.cell) {
-    let game = data.game;
-    let cell = game.cell;
+  console.log(data);
+  if (data.game && data.game.cells) {
+    const diff = changes => {
+      let before = changes[0];
+      let after = changes[1];
+      for (let i = 0; i < after.length; i++) {
+        if (before[i] !== after[i]) {
+          return {
+            index: i,
+            value: after[i],
+          };
+        }
+      }
+
+      return { index: -1, value: '' };
+    };
+
+    let cell = diff(data.game.cells);
     $('#watch-index').val(cell.index);
     $('#watch-value').val(cell.value);
-  } else {
-    console.log(data);
+  } else if (data.timeout) { //not an error
+    gameWatcher.close();
   }
-
 });
 
 gameWatcher.on('error', function (e) {

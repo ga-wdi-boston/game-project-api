@@ -2,9 +2,9 @@
 module ListenNotify
   extend ActiveSupport::Concern
 
-  included do
-    after_update :notify_update
-  end
+  # included do
+  #   after_update :notify_update
+  # end
 
   private
 
@@ -17,8 +17,10 @@ module ListenNotify
   end
 
   def notify_update
+    root = self.class.to_s.downcase
+    payload = { root => changes }.to_json
     self.class.connection.execute(
-      "NOTIFY \"#{on_update_listen_notify_channel}\", '#{changes.to_json}'"
+      "NOTIFY \"#{on_update_listen_notify_channel}\", '#{payload}'"
     )
   end
 
@@ -30,7 +32,7 @@ module ListenNotify
     timed_out = false
     until timed_out
       timed_out = !connection.raw_connection.wait_for_notify(timeout) do |event, pid, data|
-        yield data
+        yield event, data, pid
       end
     end
   ensure
@@ -39,6 +41,10 @@ module ListenNotify
 
   #
   module ClassMethods
+    def notify_on_update
+      after_update :notify_update
+    end
+
     def notify_create
       connection.execute(
         "NOTIFY \"#{on_create_listen_notify_channel}\", '#{changes}'"
