@@ -179,7 +179,7 @@ If the request is unsuccessful, the response will have an HTTP Status of 401
 
 ### signout
 
-The `signout` actions is a *DELETE* specifying the `id` of the user so sign out.
+The `signout` actions is a *DELETE* specifying the `id` of the user to sign out.
 
 If the request is successful the response will have an HTTP status of 204 No
  Content.
