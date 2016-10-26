@@ -207,7 +207,7 @@ jspm_packages
 ### Rails ###
 *.rbc
 capybara-*.html
-.rspec
+# .rspec - we want developers to have this file available
 /log
 /tmp
 /db/*.sqlite3
@@ -241,8 +241,8 @@ config/initializers/secret_token.rb
 
 # if using bower-rails ignore default bower_components path bower.json files
 /vendor/assets/bower_components
-*.bowerrc
-bower.json
+# *.bowerrc - needed in ember-template, etc.
+# bower.json - ditto
 
 # Ignore pow environment settings
 .powenv

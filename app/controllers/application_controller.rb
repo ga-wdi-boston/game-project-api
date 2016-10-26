@@ -1,20 +1,54 @@
-#
-class ApplicationController < ActionController::Base
-  # Prevent CSRF attacks by raising an exception.
-  # For APIs, you may want to use :null_session instead.
-  protect_from_forgery with: :exception
-  skip_before_action :verify_authenticity_token, if: :json_request?
-  # force_ssl if: :ssl_configured?
-
-  protected
-
-  def ssl_configured?
-    false && !Rails.env.development?
-  end
-
-  def json_request?
-    # use if more than json returned
-    # request.format.json?
+# Do not inherit from this class unless you know what you're doing
+# See ProtectedController and OpenReadController
+class ApplicationController < ActionController::API
+  # Force to wants JSON for API
+  before_action :api_request_settings
+  def api_request_settings
     request.format = :json
   end
+
+  AUTH_BLOCK = proc do |signed_token, _opts|
+    token = begin
+      Rails.application.message_verifier(:signed_token).verify(signed_token)
+    rescue ActiveSupport::MessageVerifier::InvalidSignature
+      false
+    end
+    User.find_by token: token
+  end
+
+  # Use Token Authentication
+  include ActionController::HttpAuthentication::Token::ControllerMethods
+  def authenticate
+    @current_user =
+      authenticate_or_request_with_http_token(&AUTH_BLOCK)
+  end
+
+  # call from actions to get authenticated user (or nil)
+  attr_reader :current_user
+
+  # call from unauthenticated actions that want current_user if available
+  def set_current_user
+    # for access to authenticate method
+    t = ActionController::HttpAuthentication::Token
+    @current_user = t.authenticate(self, &AUTH_BLOCK)
+  end
+
+  # Require SSL for deployed applications
+  force_ssl if: :ssl_configured?
+  def ssl_configured?
+    Rails.env.production?
+  end
+
+  # Use enhanced JSON serialization
+  include ActionController::Serialization
+
+  # return 404 for failed search by id
+  rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
+  def record_not_found
+    render json: { error: { message: 'Not Found' } }, status: :not_found
+  end
+
+  # Restrict visibility of these methods
+  private :authenticate, :current_user, :set_current_user, :record_not_found
+  private :ssl_configured?, :api_request_settings
 end
