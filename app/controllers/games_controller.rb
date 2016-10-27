@@ -9,7 +9,7 @@ class GamesController < ProtectedController
 
   def query_string_authenticate
     token = params[:token]
-    @current_user = User.find_by token: token
+    @current_user = AUTH_BLOCK.call(token)
     head :unauthorized unless current_user
   end
 
@@ -52,7 +52,7 @@ class GamesController < ProtectedController
     end
   end
 
-public
+  public
 
   def watch
     @queue = Queue.new

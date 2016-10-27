@@ -44,7 +44,8 @@ module TicTacToe
     config.middleware.insert_before 0, Rack::Cors do
       allow do
         origins do |origin, _env|
-          origin == ENV['CLIENT_ORIGIN'] ||
+          ENV['CLIENT_ORIGIN'] == '*' ||
+            origin == ENV['CLIENT_ORIGIN'] ||
             origin == "http://localhost:#{cors_port}"
         end
         resource '*',
