@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 Rails.application.routes.draw do
   resources :games, except: [:new, :edit, :destroy]
   # this is the streaming interface

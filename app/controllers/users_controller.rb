@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class UsersController < ProtectedController
   skip_before_action :authenticate, only: [:signup, :signin]
 
@@ -7,7 +8,7 @@ class UsersController < ProtectedController
     if user.valid?
       render json: user, status: :created
     else
-      head :bad_request
+      render json: user.errors, status: :bad_request
     end
   end
 
