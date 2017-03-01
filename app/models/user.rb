@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   include Authentication
   has_many :games
 end

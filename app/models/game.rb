@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-class Game < ActiveRecord::Base
+class Game < ApplicationRecord
   include ListenNotify
 
   notify_on_update
