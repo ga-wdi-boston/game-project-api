@@ -9,7 +9,7 @@ class GamesController < ProtectedController
 
   def query_string_authenticate
     token = params[:token]
-    @current_user = AUTH_BLOCK.call(token)
+    @current_user = AUTH_PROC.call(token)
     head :unauthorized unless current_user
   end
 
