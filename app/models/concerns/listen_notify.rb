@@ -52,9 +52,9 @@ module ListenNotify
     end
 
     def listen_for_create
-      connection.execute "LISTEN comments"
+      connection.execute 'LISTEN comments'
       loop do
-        connection.raw_connection.wait_for_notify do |event, pid, data|
+        connection.raw_connection.wait_for_notify do |_event, _pid, data|
           yield data
         end
       end
