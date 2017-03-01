@@ -22,7 +22,7 @@ class GamesController < ProtectedController
     if game.save
       render json: game, status: status
     else
-      render json: { errors: game.errors }, status: :bad_request
+      render json: game.errors, status: :bad_request
     end
   end
 
