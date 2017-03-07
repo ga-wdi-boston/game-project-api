@@ -9,4 +9,12 @@ class Game < ApplicationRecord
 
   validates :player_x, presence: true
   validates :player_o, presence: true, allow_nil: true
+
+  [:m, :n, :k].each do |attribute|
+    validates attribute,
+              numericality: {
+                only_integer: true,
+                greater_than_or_equal_to: 3
+              }
+  end
 end
