@@ -18,4 +18,6 @@ class Game < ApplicationRecord
                 greater_than_or_equal_to: 3
               }
   end
+
+  validates :k, numericality: { less_than_or_equal_to: [:m, :n].min }
 end
