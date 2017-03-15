@@ -4,8 +4,11 @@ class CreateGames < ActiveRecord::Migration
     create_table :games do |t|
       t.references :player_x, null: false
       t.references :player_o
-      t.boolean :over, null: false, default: false
+      t.integer :m, default: 3, null: false
+      t.integer :n, default: 3, null: false
+      t.integer :k, default: 3, null: false
       t.string :cells, array: true
+      t.boolean :over, null: false, default: false
     end
   end
 end
