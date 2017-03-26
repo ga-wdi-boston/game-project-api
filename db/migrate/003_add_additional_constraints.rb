@@ -22,7 +22,8 @@ class AddAdditionalConstraints < ActiveRecord::Migration
           ALTER TABLE games
           DROP CONSTRAINT m,
           DROP CONSTRAINT n,
-          DROP CONSTRAINT k
+          DROP CONSTRAINT k,
+          DROP CONSTRAINT cells
         SQL
       end
     end
