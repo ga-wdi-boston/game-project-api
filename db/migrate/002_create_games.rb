@@ -7,8 +7,8 @@ class CreateGames < ActiveRecord::Migration
       t.integer :m, default: 3, null: false
       t.integer :n, default: 3, null: false
       t.integer :k, default: 3, null: false
-      t.string :cells, array: true
-      t.boolean :over, null: false, default: false
+      t.string :cells, array: true, null: false
+      t.boolean :over, default: false, null: false
     end
   end
 end
