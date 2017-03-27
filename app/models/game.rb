@@ -4,6 +4,8 @@ class Game < ApplicationRecord
 
   notify_on_update
 
+  before_create :create_cells
+
   belongs_to :player_x, class_name: 'User'
   belongs_to :player_o, class_name: 'User', optional: true
 
@@ -21,4 +23,9 @@ class Game < ApplicationRecord
   end
 
   validates :k, numericality: { less_than_or_equal_to: [:m, :n].min }
+
+  def create_cells
+    self.cells = Array.new(m * n)
+  end
+  private :create_cells
 end
