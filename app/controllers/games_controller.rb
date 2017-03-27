@@ -92,7 +92,7 @@ class GamesController < ProtectedController
 
   def create
     game = Game.new(player_x: current_user)
-    save game, :created
+    save game, :created if game.valid?
   end
 
   # two main possibilities:
