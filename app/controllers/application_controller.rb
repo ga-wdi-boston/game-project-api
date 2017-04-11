@@ -49,6 +49,15 @@ class ApplicationController < ActionController::API
     render json: { error: { message: 'Not Found' } }, status: :not_found
   end
 
+  # Return 422 for missing parameters.
+  rescue_from ActionController::ParameterMissing, with: :parameter_missing
+  def parameter_missing(exception)
+    error_message = "Parameter missing: #{exception.param}."
+
+    render json: { error: { message: error_message } },
+           status: :unprocessable_entity
+  end
+
   # Restrict visibility of these methods
   private :authenticate, :current_user, :set_current_user, :record_not_found
   private :ssl_configured?, :api_request_settings
