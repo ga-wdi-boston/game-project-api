@@ -22,7 +22,7 @@ ActiveRecord::Schema.define(version: 3) do
     t.integer "n",           default: 3,     null: false
     t.integer "k",           default: 3,     null: false
     t.string  "cells",                       null: false, array: true
-    t.boolean "over",        default: false
+    t.boolean "over",        default: false, null: false
   end
 
   create_table "users", force: :cascade do |t|
