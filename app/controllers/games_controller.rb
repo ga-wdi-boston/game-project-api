@@ -103,10 +103,10 @@ class GamesController < ProtectedController
   def update
     if (updates = params[:game]) && !updates.empty?
       game = base_query.find(params[:id])
-      if (cell = updates[:cell])
+      if (cell = update_params[:cell])
         game.cells[cell[:index].to_i] = cell[:value]
       end
-      if (over = updates[:over])
+      if (over = update_params[:over])
         game.over = over
       end
       save game
@@ -120,4 +120,13 @@ class GamesController < ProtectedController
       end
     end
   end
+
+  def update_params
+    params.require(:game).permit({ cell: [:index, :value] }, :over).tap do |game_params|
+      game_params.require(:cell).permit(:index, :value).tap do |cell_params|
+        cell_params.require([:index, :value])
+      end
+    end
+  end
+  private :update_params
 end
