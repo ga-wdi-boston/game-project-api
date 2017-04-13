@@ -56,7 +56,7 @@ class GamesController < ProtectedController
 
   def watch
     @queue = Queue.new
-    @game = base_query.where(over: false).find(params[:id])
+    @game = Game.where(over: false).find(params[:id])
     @timeout = params[:timeout] ? params[:timeout].to_i : 120
     heartbeat = start_heartbeat
     notify = start_notify
