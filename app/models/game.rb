@@ -12,17 +12,18 @@ class Game < ApplicationRecord
   validates :player_x, presence: true
   validates :player_o, presence: true, allow_nil: true
 
-  [:m, :n, :k].each do |attr|
-    validates attr,
-              presence: true,
-              numericality: {
-                only_integer: true,
-                greater_than_or_equal_to: 3,
-                less_than_or_equal_to: 20
-              }
+  [:m, :n].each do |attr|
+    validates attr, presence: true, numericality: {
+      only_integer: true,
+      greater_than_or_equal_to: 3,
+      less_than_or_equal_to: 20
+    }
   end
 
-  validates :k, numericality: { less_than_or_equal_to: [:m, :n].min }
+  validates :k, numericality: {
+    only_integer: true,
+    less_than_or_equal_to: [:m, :n].min
+  }
 
   def create_cells
     self.cells = Array.new(m * n)
