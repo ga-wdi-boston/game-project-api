@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 class Game < ApplicationRecord
   include ListenNotify
+  include TicTacToeValidation
 
   notify_on_update
 

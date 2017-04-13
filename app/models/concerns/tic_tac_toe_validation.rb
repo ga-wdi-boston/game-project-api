@@ -3,14 +3,14 @@ module TicTacToeValidation
   extend ActiveSupport::Concern
 
   included do
-    validate :no_cell_reset
+    validate :no_cell_reset, on: :update
   end
 
   private
 
   def cell_reset?
     cells_was.zip(cells).any? do |e|
-      e.first != e.last && !e.first.empty?
+      e.first != e.last && !e.first.nil?
     end
   end
 
