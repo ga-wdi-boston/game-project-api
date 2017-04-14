@@ -106,9 +106,6 @@ class GamesController < ProtectedController
       if (cell = update_params[:cell])
         game.cells[cell[:index].to_i] = cell[:value]
       end
-      if (over = update_params[:over])
-        game.over = over
-      end
       save game
     else # join the game
       game = Game.find(params[:id])
@@ -122,7 +119,7 @@ class GamesController < ProtectedController
   end
 
   def update_params
-    params.require(:game).permit({ cell: [:index, :value] }, :over).tap do |game_params|
+    params.require(:game).permit(cell: [:index, :value]).tap do |game_params|
       game_params.require(:cell).permit(:index, :value).tap do |cell_params|
         cell_params.require([:index, :value])
       end
