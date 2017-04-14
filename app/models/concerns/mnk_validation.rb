@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-module TicTacToeValidation
+module MNKValidation
   extend ActiveSupport::Concern
 
   included do
