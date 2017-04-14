@@ -2,6 +2,7 @@
 class Game < ApplicationRecord
   include ListenNotify
   include TicTacToeValidation
+  include GameOverCheck
 
   notify_on_update
 
@@ -26,8 +27,9 @@ class Game < ApplicationRecord
     less_than_or_equal_to: [:m, :n].min
   }
 
+  private
+
   def create_cells
     self.cells = Array.new(m * n)
   end
-  private :create_cells
 end
