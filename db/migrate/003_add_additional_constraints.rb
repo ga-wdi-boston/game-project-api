@@ -1,20 +1,28 @@
 # frozen_string_literal:true
-# rubocop:disable Metrics/MethodLength
+
 class AddAdditionalConstraints < ActiveRecord::Migration
+  def add_constraint(column, constraint)
+    query = "ALTER TABLE games ADD CONSTRAINT #{column} CHECK (#{constraint});"
+
+    execute(query)
+  end
+
+  # rubocop:disable Metris/AbcSize, Metrics/MethodLength
   def change
+    m, n = Rails.application.config.game_settings.values_at(:m, :n)
+
     reversible do |direction|
       direction.up do
-        execute <<-SQL.squish
-          ALTER TABLE games
-          ADD CONSTRAINT m
-          CHECK (m >= 3 AND m <= 20),
-          ADD CONSTRAINT n
-          CHECK (n >= 3 AND n <= 20),
-          ADD CONSTRAINT k
-          CHECK (k >= 3 AND k <= LEAST(m, n)),
-          ADD CONSTRAINT cells
-          CHECK (array_length(cells, 1) = m * n)
-        SQL
+        constraints = {
+          m: "m >= #{m[:min]} AND m <= #{m[:max]}",
+          n: "n >= #{n[:min]} AND n <= #{n[:max]}",
+          k: "k >= #{[m[:min], n[:min]].min} AND k <= LEAST(m, n)",
+          cells: 'array_length(cells, 1) = m * n'
+        }
+
+        constraints.each do |column, constraint|
+          add_constraint(column, constraint)
+        end
       end
 
       direction.down do
