@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class Game < ApplicationRecord
   include ListenNotify
   include MNKValidation
@@ -14,18 +15,22 @@ class Game < ApplicationRecord
   validates :player_x, presence: true
   validates :player_o, presence: true, allow_nil: true
 
-  [:m, :n].each do |attr|
-    validates attr, presence: true, numericality: {
-      only_integer: true,
-      greater_than_or_equal_to: 3,
-      less_than_or_equal_to: 20
-    }
-  end
+  m, n = Rails.application.config.game_settings.values_at(:m, :n)
 
-  validates :k, numericality: {
+  validates :m, presence: true, numericality: {
     only_integer: true,
-    greater_than_or_equal_to: 3,
-    less_than_or_equal_to: [:m, :n].min
+    greater_than_or_equal_to: m[:min],
+    less_than_or_equal_to: m[:max]
+  }
+  validates :n, presence: true, numericality: {
+    only_integer: true,
+    greater_than_or_equal_to: n[:min],
+    less_than_or_equal_to: n[:max]
+  }
+  validates :k, presence: true, numericality: {
+    only_integer: true,
+    greater_than_or_equal_to: [m[:min], n[:min]].min,
+    less_than_or_equal_to: %i[m n].min
   }
 
   private
