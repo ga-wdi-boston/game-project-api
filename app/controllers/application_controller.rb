@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # Do not inherit from this class unless you know what you're doing
 # See ProtectedController and OpenReadController
 class ApplicationController < ActionController::API

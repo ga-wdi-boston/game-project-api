@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module ListenNotify
   extend ActiveSupport::Concern
 
@@ -31,7 +32,8 @@ module ListenNotify
     connection.execute "LISTEN \"#{on_update_listen_notify_channel}\""
     timed_out = false
     until timed_out
-      timed_out = !connection.raw_connection.wait_for_notify(timeout) do |event, pid, data|
+      raw_connection = connection.raw_connection
+      timed_out = !raw_connection.wait_for_notify(timeout) do |event, pid, data|
         yield event, data, pid
       end
     end
