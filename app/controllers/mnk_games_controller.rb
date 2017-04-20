@@ -92,8 +92,14 @@ class MNKGamesController < ProtectedController
   end
 
   def create
-    game = Game.new(player_x: current_user)
-    save game, :created if game.valid?
+    game = Game.new(create_params)
+    game.player_x = current_user
+
+    if game.valid?
+      save game, :created
+    else
+      render json: game.errors, status: :unprocessable_entity
+    end
   end
 
   # two main possibilities:
@@ -119,6 +125,14 @@ class MNKGamesController < ProtectedController
     end
   end
 
+  private
+
+  def create_params
+    params.require(:game).permit(:m, :n, :k).tap do |game_params|
+      game_params.require(%i[m n k])
+    end
+  end
+
   def update_params
     params.require(:game).permit(cell: %i[index value]).tap do |game_params|
       game_params.require(:cell).permit(:index, :value).tap do |cell_params|
@@ -126,5 +140,4 @@ class MNKGamesController < ProtectedController
       end
     end
   end
-  private :update_params
 end
