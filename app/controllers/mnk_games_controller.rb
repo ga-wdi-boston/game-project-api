@@ -1,5 +1,6 @@
 # frozen_string_literal: true
-class GamesController < ProtectedController
+
+class MNKGamesController < ProtectedController
   include ActionController::Live
 
   skip_before_action :authenticate, only: :watch
@@ -119,9 +120,9 @@ class GamesController < ProtectedController
   end
 
   def update_params
-    params.require(:game).permit(cell: [:index, :value]).tap do |game_params|
+    params.require(:game).permit(cell: %i[index value]).tap do |game_params|
       game_params.require(:cell).permit(:index, :value).tap do |cell_params|
-        cell_params.require([:index, :value])
+        cell_params.require(%i[index value])
       end
     end
   end
