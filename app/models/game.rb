@@ -30,7 +30,7 @@ class Game < ApplicationRecord
   validates :k, presence: true, numericality: {
     only_integer: true,
     greater_than_or_equal_to: [m[:min], n[:min]].min,
-    less_than_or_equal_to: %i[m n].min
+    less_than_or_equal_to: proc { |game| [game.m, game.n].min }
   }
 
   private
