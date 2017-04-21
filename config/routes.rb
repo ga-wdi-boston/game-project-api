@@ -28,7 +28,7 @@ Rails.application.routes.draw do
                        defaults: { game: { m: 3, n: 3, k: 3 } }
 
   # this is the streaming interface
-  get '/mnk_games/:id/watch' => 'mnk_games#watch'
+  get '/mnk-games/:id/watch' => 'mnk_games#watch'
   get '/games/:id/watch' => 'mnk_games#watch'
   get '/gomoku/:id/watch' => 'mnk_games#watch'
   get '/tic-tac-toe/:id/watch' => 'mnk_games#watch'
