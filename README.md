@@ -27,6 +27,11 @@ All data returned from API actions is formatted as JSON.
 
 ---
 
+## Deployed URI End Points
+
+Development: http://tic-tac-toe.wdibos.com
+Production: https://aqueous-atoll-85096.herokuapp.com/
+
 ## User actions
 
 *Summary:*
